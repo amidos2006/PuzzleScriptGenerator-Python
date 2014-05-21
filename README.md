@@ -7,7 +7,7 @@ Same puzzle script engine written in python with another engine to solve puzzles
 ### How to run action
 - Make object from Class Engine
 - Call ProcessInput and give it action you want ("left", "right", "up", "down", "action") and which level you want to play it from levels array
-- it will do everything and print to you new level data
+- You can print the level and see the effect (Check __init__.py script)
 
 ### Target
 - Puzzle Script Engine working in Python
