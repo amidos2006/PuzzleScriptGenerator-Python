@@ -24,5 +24,6 @@ Same puzzle script engine written in python with another engine to solve puzzles
 
 ### Version v0.3
 - Puzzle Script Engine now supports undo
+- Puzzle Script Engine logging while solving can be disabled
 - Auto solver module added
 - Auto solver gets all possible unique solutions
