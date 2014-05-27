@@ -26,6 +26,6 @@ Same puzzle script engine written in python with another engine to solve puzzles
 - Puzzle Script Engine now supports undo and can be disabled
 - Puzzle Script Engine logging while solving can be disabled
 - Puzzle Script Engine fixing legends can be disabled
-- Fixing bug with Puzzle Script Engine
+- Fixing bug with Puzzle Script Engine in Applying Rules in Rule class
 - Auto solver module added
 - Auto solver gets all possible unique solutions
