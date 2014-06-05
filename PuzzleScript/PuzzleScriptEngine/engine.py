@@ -3,6 +3,10 @@ import copy
 
 class Engine(object):
     actionArray = ["left", "right", "up", "down", "action"]
+    undoArray = []
+    verboseLogging = True
+    disableUndo = False
+    disableLegendFix = False
     
     def __init__(self, objectLines = [], legendLines = [], layerLines = [], ruleLines = [], winLines = [], levelLines = []):
         self.objects = []
@@ -61,40 +65,65 @@ class Engine(object):
                 tempLines.append(ll)
             else:
                 self.levels.append(Level(tempLines, self.legends, self.layers))
+                self.undoArray.append([])
                 tempLines = []
         if len(tempLines) > 0:
             self.levels.append(Level(tempLines, self.legends, self.layers))
+            self.undoArray.append([])
         
         Level.directionMap = {"left":Point(-1, 0), "right":Point(1, 0), "up":Point(0, -1), "down":Point(0, 1), "action":Point(0, 0)}
     
     def ProcessInput(self, action, levelIndex):
+        if not self.disableUndo:
+            self.undoArray[levelIndex].append(copy.deepcopy(self.levels[levelIndex]))
+        
         playerIndex = Helper.GetLayerNumber("player", self.layers)
         playerPositions = self.levels[levelIndex].GetIndexFromObjectID("player")
-        print "Adding the action to player"
+        if self.verboseLogging:
+            print "Adding the action to player"
         for p in playerPositions:
             self.levels[levelIndex].map[p.y][p.x].actions[playerIndex] = action.strip().lower()
             
-        print "Applying Rules"
+        if self.verboseLogging:
+            print "Applying Rules"
         for gr in self.rules:
             if not gr.late:
                 gr.ApplyRule(self.levels[levelIndex])
         
-        print "Make Movements"
+        if self.verboseLogging:
+            print "Make Movements"
         self.levels[levelIndex].MakeMovements()
         
-        print "Applying late Rules"
+        if self.verboseLogging:
+            print "Applying late Rules"
         for gr in self.rules:
             if gr.late:
                 gr.ApplyRule(self.levels[levelIndex])
                 
-        print "Check win Condition"
+        if self.verboseLogging:
+            print "Check win Condition"
         winResult = False
         for wc in self.winConditions:
             winResult = winResult or wc.CheckWinCondition(self.levels[levelIndex])
-            
-        self.levels[levelIndex].FixLegends(self.legends)
+        
+        if not self.disableLegendFix:
+            self.levels[levelIndex].FixLegends(self.legends)
         return winResult    
         
+    def Undo(self, levelIndex):
+        if self.disableUndo:
+            return  False
+        
+        if len(self.undoArray[levelIndex]) > 0:
+            if self.verboseLogging:
+                print "Undoing last step"
+            self.levels[levelIndex] = self.undoArray[levelIndex][-1]
+            self.undoArray[levelIndex].pop()
+            return True
+        return False
+    
+    def ClearLevelUndo(self, levelIndex):
+        del self.undoArray[levelIndex][:]
 
 class GroupRule(object):
     maxWidth = 30
@@ -230,6 +259,7 @@ class Rule(object):
         for i in range(len(matchingTuplesPoints)):
             for s in range(len(self.lhs[i].layers)):
                 mapLayer = level.map[matchingTuplesPoints[i].y + yDir * s][matchingTuplesPoints[i].x + xDir * s]
+                initialLayer = self.lhs[i].layers[s]
                 finalLayer = copy.deepcopy(self.rhs[i].layers[s])
                 
                 for l in range(len(mapLayer.objects)):
@@ -241,8 +271,10 @@ class Rule(object):
                         finalLayer.actions[l] = None
                     
                     if mapLayer.objects[l] != "background":
-                        mapLayer.objects[l] = finalLayer.objects[l]
-                        mapLayer.actions[l] = finalLayer.actions[l]
+                        if initialLayer.objects[l] != finalLayer.objects[l]:
+                            mapLayer.objects[l] = finalLayer.objects[l]
+                        if initialLayer.actions[l] != finalLayer.actions[l]:
+                            mapLayer.actions[l] = finalLayer.actions[l]
                     
         return True
     
@@ -460,8 +492,15 @@ class Level(object):
         self.map[y][x].objects[index] = None
         self.map[y][x].actions[index] = None
         return True
-        
     
+    def CheckEqual(self, level):
+        for x in range(self.width):
+            for y in range(self.height):
+                for l in range(len(self.map[y][x].objects)):
+                    if self.map[y][x].objects[l] != level.map[y][x].objects[l]:
+                        return False
+        return True
+        
     def FixLegends(self, legends):
         for x in range(self.width):
             for y in range(self.height):

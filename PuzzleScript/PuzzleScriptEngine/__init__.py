@@ -1,4 +1,6 @@
+import time
 from engine import *
+from autosolver import *
 
 objectLines = ["Background", "GREEN", " ", "Target", "DarkBlue", "", "Wall", "BROWN", "    ", "Player", "Blue", " ", "Crate", "Orange"]
 legendLines = [". = Background", "# = Wall", "P = Player", "* = Crate", "@ = Crate and Target", "O = Target"]
@@ -7,19 +9,19 @@ ruleLines = [" down[down Player | Crate] -> [down Player | down Crate ]", "+up[U
 winLines = ["All Crate on Target"]
 levelLines = ["#########", "#.......#", "#.....@.#", "#.P.*.O.#", "#.......#", "#.......#", "#########"]
 
-e = Engine(objectLines, legendLines, layerLines, ruleLines, winLines, levelLines)
+engine = Engine(objectLines, legendLines, layerLines, ruleLines, winLines, levelLines)
+engine.verboseLogging = False
+autoSolver = AutoSolver()
+autoSolver.verboseLogging = False
 
 print " "
 print "----------------------"
 print "--- Testing"
 print "----------------------"
-print e.levels[0]
+print " "
 
-print e.ProcessInput("right", 0)
-print e.levels[0]
+start_time = time.time()
 
-print e.ProcessInput("right", 0)
-print e.levels[0]
+print autoSolver.GetSolutions(engine, 0)
 
-print e.ProcessInput("right", 0)
-print e.levels[0]
+print time.time() - start_time, "seconds"
