@@ -21,3 +21,11 @@ Same puzzle script engine written in python with another engine to solve puzzles
 - Late rule is a group rule so either the whole group is late or not
 - Random rule is a group rule so either choose a random rule to apply or not
 - No undo supported
+
+### Version v0.3
+- Puzzle Script Engine now supports undo and can be disabled
+- Puzzle Script Engine logging while solving can be disabled
+- Puzzle Script Engine fixing legends can be disabled
+- Fixing bug with Puzzle Script Engine in Applying Rules in Rule class
+- Auto solver module added
+- Auto solver gets all possible unique solutions
