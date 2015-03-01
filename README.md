@@ -1,4 +1,5 @@
 # PuzzleScriptGenerator-Python
+This project is shifted towards https://github.com/amidos2006/PuzzleScript-PCG where it utilise the main engine of PuzzleScript as it is proved that it is faster than this one and have more capabilities.
 
 Same puzzle script engine written in python with another engine to solve puzzles then generate level then generate rules
 
